@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // 入口:stdio MCP server。日志只进文件/stderr,stdout 专用于 MCP 协议。
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -10,7 +11,7 @@ import { initLogging, log } from "./util.js";
 async function main(): Promise<void> {
   // --help / --version
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    process.stderr.write(`agent-browser-mcp — 给 agent 用的可靠浏览器控制 MCP server
+    process.stderr.write(`browser-ref-mcp — 给 agent 用的可靠浏览器控制 MCP server
 
 用法: node dist/index.js [选项]
   --cdp-url <url>     connect 模式:连接已开调试端口的浏览器(如 http://127.0.0.1:9222)
@@ -35,7 +36,7 @@ async function main(): Promise<void> {
   const registry = new RefRegistry();
 
   const server = new Server(
-    { name: "agent-browser-mcp", version: "0.1.0" },
+    { name: "browser-ref-mcp", version: "0.1.0" },
     { capabilities: { tools: {} } },
   );
   registerTools(server, manager, registry);
@@ -71,6 +72,6 @@ async function main(): Promise<void> {
 
 main().catch(async (e) => {
   await log("error", "fatal startup error", e).catch(() => {});
-  process.stderr.write(`agent-browser-mcp 启动失败: ${e instanceof Error ? e.stack : String(e)}\n`);
+  process.stderr.write(`browser-ref-mcp 启动失败: ${e instanceof Error ? e.stack : String(e)}\n`);
   process.exit(1);
 });

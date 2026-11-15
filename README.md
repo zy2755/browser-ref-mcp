@@ -1,157 +1,175 @@
-# agent-browser-mcp
+# browser-ref-mcp
 
-给 AI agent 用的可靠浏览器控制 MCP server。针对现有浏览器工具的两大痛点专门设计:
+[![npm](https://img.shields.io/npm/v/browser-ref-mcp)](https://www.npmjs.com/package/browser-ref-mcp)
+[![license](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
+[![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 
-- **点不了网页内容** → 语义快照 + ref 编号定位 + 多级兜底(见下文"点击是怎么解决的")
-- **频繁断联出错** → 常驻进程 + 崩溃懒重启 + 会话恢复(见下文"断联是怎么解决的")
+**A reliable browser-control MCP server for AI agents.** Click by `ref`, not by brittle CSS selectors — and when the browser dies, the next call just brings it back.
 
-技术栈:Node + TypeScript + playwright-core(免下载浏览器,直接驱动系统已装的 Chrome/Edge)。
+Built for the two things that actually break agent-driven browsing:
 
-## 接入 MCP 客户端
+| The problem | What happens with most browser tools | What this server does |
+|---|---|---|
+| **The agent can't click what it sees** | Selectors go stale between snapshot and click, shadow DOM and cross-origin iframes are invisible, the agent retries blindly | Semantic snapshot with `[eN]` refs, shadow DOM and cross-origin iframes flattened into one tree, four-level resolution fallback |
+| **Sessions keep dying** | Browser closed by hand, process crash, port conflict — and the agent is stuck until you restart everything | Resident process, lazy restart on next call, tab session restored, orphan cleanup, timeout guardrails |
 
-server 走 stdio,任何支持 stdio MCP 的客户端都能接。先 `npm install && npm run build`,再把 `dist/index.js` 的**绝对路径**填进客户端配置(GUI 应用常不继承 shell 的工作目录,相对路径容易解析失败)。
+No browser download. It drives the Chrome or Edge you already have, via `playwright-core`.
 
-### 通用配置
+Works with Claude Code, Claude Desktop, Cursor, Cline, Codex CLI, Windsurf, OpenClaw, and any client that speaks stdio MCP.
 
-```json
-{
-  "mcpServers": {
-    "agent-browser-mcp": {
-      "command": "node",
-      "args": ["/absolute/path/to/agent-browser-mcp/dist/index.js"]
-    }
-  }
-}
-```
+---
 
-若客户端启动时拿不到 shell 的 `PATH`,把 `command` 换成 node 可执行文件的完整路径,如 `/usr/local/bin/node` 或 `C:\\Program Files\\nodejs\\node.exe`。
-
-### Claude Desktop
-
-配置文件位置:
-
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "agent-browser-mcp": {
-      "command": "node",
-      "args": ["C:\\path\\to\\agent-browser-mcp\\dist\\index.js"]
-    }
-  }
-}
-```
-
-写完后**完全退出并重启**客户端(macOS 需从菜单栏退出,只关窗口不会重载配置)。Claude Code / Cline / Cursor / OpenClaw 等同样用这份 `mcpServers` 结构,只是配置文件位置不同。
-
-### 启动参数
-
-需要调整浏览器行为时,直接往 `args` 追加命令行参数:
-
-```json
-"args": ["/absolute/path/to/dist/index.js", "--headless", "--channels", "msedge"]
-```
-
-完整参数见 `node dist/index.js --help`。更推荐把常用项固化到 `~/.browser-mcp/config.json`(见下文「配置」),这样多个客户端共用一份配置。
-
-## 构建
+## Quick start
 
 ```bash
-npm install
-npm run build     # 产物在 dist/
-npm run smoke     # 冒烟测试(40 项,会真实启动 Chrome)
-npm run serve:fixtures   # 本地测试页(手动调试用)
+npx -y browser-ref-mcp
 ```
 
-## 工具集(14 个)
+Or add it to your client config:
 
-| 工具 | 说明 |
+```json
+{
+  "mcpServers": {
+    "browser-ref-mcp": {
+      "command": "npx",
+      "args": ["-y", "browser-ref-mcp"]
+    }
+  }
+}
+```
+
+Restart the client **completely** (on macOS quit from the menu bar — closing the window does not reload config).
+
+<details>
+<summary>Install from source instead</summary>
+
+```bash
+git clone https://github.com/zy2755/browser-ref-mcp.git
+cd browser-ref-mcp
+npm install && npm run build
+```
+
+Then point `command` at `node` and `args` at the **absolute** path of `dist/index.js` — GUI apps often don't inherit your shell's working directory, so relative paths tend to fail:
+
+```json
+{
+  "mcpServers": {
+    "browser-ref-mcp": {
+      "command": "node",
+      "args": ["/absolute/path/to/browser-ref-mcp/dist/index.js"]
+    }
+  }
+}
+```
+
+Config file locations:
+
+- **Claude Desktop** — macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Cursor** — `~/.cursor/mcp.json`, or Settings → Features → MCP
+- **Claude Code** — `claude mcp add`, or the same `mcpServers` shape
+
+</details>
+
+---
+
+## The 14 tools
+
+| Tool | What it does |
 |---|---|
-| `browser_navigate(url)` | 导航,**自动附交互元素快照** |
-| `browser_snapshot` | 语义快照;`filter:"interactive"` 只看交互元素,`rootRef` 只看某元素子树 |
-| `browser_click(ref)` | 点击;点击后自动附新快照;失效 ref 自动重解析 |
-| `browser_type(ref, text)` | 输入(先清空);`submit:true` 回车提交 |
-| `browser_press_key(key)` | 按键,如 `Enter` / `Escape` / `Control+a` |
-| `browser_select_option(ref, values)` | 下拉选择,value/label 自动两轮匹配 |
-| `browser_hover(ref)` | 悬停(触发悬浮菜单) |
-| `browser_scroll(direction, amount, ref?)` | 滚动页面或指定滚动容器 |
-| `browser_screenshot` | 截屏,返回图片 + 落盘 |
-| `browser_evaluate(js)` | 逃生舱:页面内执行 JS |
-| `browser_wait` | 等待:时长 / 文本出现 / 元素出现 / URL 变化 / 网络空闲 |
-| `browser_tabs` | 多标签管理:list / new / select / close |
-| `browser_get_info` | 健康状态、标签列表、重启次数、最近错误 |
-| `browser_close` | 关闭浏览器(profile 登录态保留) |
+| `browser_navigate(url)` | Navigate — automatically returns an interactive-element snapshot |
+| `browser_snapshot` | Semantic snapshot. `filter: "interactive"` for interactive elements only, `rootRef` to scope to one subtree |
+| `browser_click(ref)` | Click by ref, returns a fresh snapshot. Stale refs are re-resolved automatically |
+| `browser_type(ref, text)` | Type into a field (clears first). `submit: true` presses Enter |
+| `browser_press_key(key)` | Key press, e.g. `Enter` / `Escape` / `Control+a` |
+| `browser_select_option(ref, values)` | Pick `<select>` options by value or label, two-pass match |
+| `browser_hover(ref)` | Hover to reveal hover-only menus |
+| `browser_scroll(direction, amount, ref?)` | Scroll the page, or a specific scroll container |
+| `browser_screenshot` | Screenshot — returns the image and writes it to disk |
+| `browser_evaluate(js)` | Escape hatch: run JS in the page |
+| `browser_wait` | Wait for a duration, text, element, URL change, or network idle |
+| `browser_tabs` | Multi-tab: `list` / `new` / `select` / `close` |
+| `browser_get_info` | Health state, tab list, restart count, last error |
+| `browser_close` | Close the browser (profile logins are kept) |
 
-**ref 的用法**:快照里每个可交互元素带 `[eN]` 编号,`browser_click({ ref: "e42" })` 直接引用。iframe 内元素拍平进同一棵树,编号同样可用。
+### Using refs
 
-## 点击是怎么解决的
+Every interactive element in a snapshot carries an `[eN]` label:
 
-1. **语义快照**:in-page DOM 遍历(无障碍角色 + 可访问名 + cursor:pointer 启发式),穿透 **open shadow DOM**,跨源 **iframe 内容拍平**进同一棵树;
-2. **ref → 定位配方**:每个 ref 同时记录 css 路径(有 id 锚定 + nth-of-type,frame 内唯一)和 role+name 语义描述;
-3. **解析兜底链**:cssPath → getByRole 精确 → getByRole 模糊 → getByText,任何一层命中都验证后使用;
-4. **绝不死路**:ref 彻底失效时报错信息里直接给出行动建议(重新快照 / 先等待),不会让 agent 卡死。
+```
+[e38] link "Sign in"
+[e42] textbox "Email"
+[e51] button "Continue"
+```
 
-## 断联是怎么解决的
+So the agent calls `browser_click({ "ref": "e42" })` — no selector guessing, no DOM archaeology. Elements inside iframes are flattened into the same tree with the same numbering, including across origins.
 
-- **进程模型**:MCP server 本身就是常驻 daemon(stdio 客户端会长期持有),浏览器经 **CDP pipe**(非 websocket 端口)启动,无端口冲突;
-- **懒重启**:每次工具调用前健康检查(`browser.isConnected()`);浏览器被手动关闭/崩溃后,下一次调用自动重启并**恢复所有标签页**,结果中明确提示"旧 ref 已失效";
-- **孤儿清理**:profile 被残留进程占用时,启动前按 profile 路径定向 taskkill,再重试;
-- **悬挂护栏**:所有 Playwright 调用套 `withTimeout`,浏览器僵死时调用能超时返回而不是永久卡住;
-- **全链路日志**:`~/.browser-mcp/logs/server-YYYYMMDD.log`(2MB 轮转,保留 3 份),`browser_get_info` 可查最近错误与重启次数。
+---
 
-## 浏览器来源(双模式)
+## How clicking actually works
 
-- **launch 模式(默认)**:启动专用 Chrome,profile 在 `~/.browser-mcp/profile` —— 登录态持久保存,重启不丢。首次用某网站需在此 profile 登录一次。
-- **connect 模式**:接管已开调试端口的现有浏览器,退出时不杀它:
+Most "click by selector" failures come from the page changing between the moment the agent reads it and the moment it clicks. This server separates *reading* from *locating*:
+
+1. **Semantic snapshot** — an in-page DOM walk (accessibility role + accessible name + `cursor: pointer` heuristics) that pierces **open shadow DOM** and flattens **cross-origin iframe** content into a single tree.
+2. **Ref → locator recipe** — each ref stores both a CSS path (id-anchored + `nth-of-type`, unique within its frame) *and* a role+name semantic description.
+3. **Resolution fallback chain** — `cssPath` → `getByRole` exact → `getByRole` fuzzy → `getByText`. Anything that hits is validated before use.
+4. **Never a dead end** — if a ref is truly dead, the error message tells the agent what to do next (re-snapshot, or wait first) instead of leaving it stuck in a retry loop.
+
+## How reconnection works
+
+- **Process model** — the MCP server itself is a resident daemon (stdio clients hold it open). The browser launches over a **CDP pipe**, not a websocket port, so there are no port conflicts.
+- **Lazy restart** — a health check runs before every tool call (`browser.isConnected()`). If the browser was closed by hand or crashed, the next call relaunches it and **restores all tabs**, explicitly telling the agent that old refs are invalid.
+- **Orphan cleanup** — if a leftover process is holding the profile, it is killed by profile path before retrying.
+- **Hang guardrails** — every Playwright call is wrapped in `withTimeout`, so a frozen browser returns a timeout instead of hanging forever.
+- **Full-chain logging** — `~/.browser-mcp/logs/server-YYYYMMDD.log` (2 MB rotation, 3 files kept). `browser_get_info` exposes the last error and restart count.
+
+---
+
+## Browser modes
+
+**`launch` mode (default)** — starts a dedicated Chrome with its profile at `~/.browser-mcp/profile`. Logins persist across restarts. You sign in to a given site once in this profile.
+
+**`connect` mode** — attach to an already-running browser that has a debugging port open; it is not killed on exit:
 
 ```bash
-# 先手动带调试端口启动 Chrome
+# start Chrome with a debugging port first
 chrome.exe --remote-debugging-port=9222
-# server 端
-node dist/index.js --connect          # 默认 http://127.0.0.1:9222
+
+node dist/index.js --connect          # defaults to http://127.0.0.1:9222
 node dist/index.js --cdp-url http://127.0.0.1:9223
 ```
 
-## 配置
+## Configuration
 
-优先级:命令行参数 > 环境变量(`BROWSER_MCP_*`)> `~/.browser-mcp/config.json` > 内置默认。
+Precedence: CLI args > env vars (`BROWSER_MCP_*`) > `~/.browser-mcp/config.json` > built-in defaults.
 
-常用参数:`--headless`(无头)/ `--profile <dir>` / `--channels chrome,msedge` / `--executable <path>` / `--viewport 1440x900` / `--start-url <url>` / `--dialogs accept|dismiss`(对话框自动处理策略,默认 accept)。
+Common flags: `--headless` / `--profile <dir>` / `--channels chrome,msedge` / `--executable <path>` / `--viewport 1440x900` / `--start-url <url>` / `--dialogs accept|dismiss` (default `accept`).
 
-完整参数见 `node dist/index.js --help`。
+Append them after the package name:
 
-## 目录结构
-
-```
-src/
-  index.ts           入口:stdio server、优雅退出
-  config.ts          配置解析(文件/环境变量/命令行)
-  browserManager.ts  浏览器生命周期:启动/健康检查/懒重启/会话恢复/弹窗对话框下载
-  session.ts         标签页登记与持久化(原子写)
-  snapshot.ts        in-page DOM walker + ref 注册表 + frame 拼接 + 渲染
-  actions.ts         ref 解析兜底链 + 各类动作实现
-  tools.ts           14 个 MCP 工具定义与接线
-  errors.ts          错误整形(结构化 code + 行动建议)
-  util.ts            日志(轮转)/超时护栏/截断
-test/
-  fixtures/          本地测试页(基础/shadow/跨源iframe/对话框/懒加载)
-  serve.mjs          fixture 服务器
-  smoke.mjs          40 项冒烟测试(含杀进程恢复、server 重启恢复)
-  e2e-baidu.mjs      真实互联网端到端(百度搜索全流程)
+```json
+"args": ["-y", "browser-ref-mcp", "--headless", "--channels", "msedge"]
 ```
 
-## 安全提示
+Full list: `npx -y browser-ref-mcp --help`.
 
-- 专用 profile 存有登录态(Cookies),等同于你的浏览器身份,注意不要把 `~/.browser-mcp/profile` 提交到任何仓库;
-- 工具会自动接受页面对话框(默认策略),agent 无法处理验证码/支付类强交互,这些仍需人工;
-- 日志可能包含页面 URL(含查询参数),排查问题后注意清理。
+> **Don't set `executablePath` unless you have to.** Once it is set, the `channels` fallback chain (`chrome` → `msedge`) is skipped and only that single candidate remains — which lowers robustness across machines.
 
-## 二期 backlog
+---
 
-文件上传、下载管理增强、请求拦截、Cookie/存储管理、PDF 导出、CLI 前端。
+## Security notes
 
-## 许可证
+- The dedicated profile holds live logins (cookies) — it *is* your browser identity. Never commit `~/.browser-mcp/profile` to any repository.
+- Page dialogs are auto-accepted by default. The agent cannot handle CAPTCHAs or payment flows; those still need a human.
+- Logs may contain page URLs including query parameters — clean them up after debugging.
 
-Apache-2.0,见 [LICENSE](LICENSE)。
+## Roadmap
+
+File upload, richer download management, request interception, cookie/storage management, PDF export, a CLI front end.
+
+## License
+
+[Apache-2.0](./LICENSE)
+
+---
+
+[中文说明](./README.zh-CN.md)

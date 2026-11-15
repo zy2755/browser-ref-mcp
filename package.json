@@ -1,21 +1,49 @@
 {
-  "name": "agent-browser-mcp",
+  "name": "browser-ref-mcp",
   "version": "0.1.0",
-  "description": "MCP server that gives AI agents reliable browser control (click-by-ref, auto-healing sessions)",
+  "description": "Reliable browser-control MCP server for AI agents: click by ref, self-healing sessions.",
+  "mcpName": "io.github.zy2755/browser-ref-mcp",
   "type": "module",
-  "private": true,
   "bin": {
-    "browser-mcp": "dist/index.js"
+    "browser-ref-mcp": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
     "serve:fixtures": "node test/serve.mjs",
     "smoke": "node test/smoke.mjs"
   },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "browser-automation",
+    "browser-control",
+    "playwright",
+    "ai-agent",
+    "claude",
+    "cursor",
+    "web-scraping"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zy2755/browser-ref-mcp.git"
+  },
+  "homepage": "https://github.com/zy2755/browser-ref-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/zy2755/browser-ref-mcp/issues"
+  },
+  "author": "zy2755",
+  "license": "Apache-2.0",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
     "playwright-core": "^1.53.0"
