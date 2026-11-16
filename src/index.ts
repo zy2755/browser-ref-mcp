@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 入口:stdio MCP server。日志只进文件/stderr,stdout 专用于 MCP 协议。
+import { readFileSync } from "node:fs";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { loadConfig } from "./config.js";
@@ -8,12 +9,24 @@ import { RefRegistry } from "./snapshot.js";
 import { registerTools } from "./tools.js";
 import { initLogging, log } from "./util.js";
 
+// 版本号只从 package.json 取一处,避免发版时漏改。
+// dist/index.js 的上一级就是包根目录。
+const pkg = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+) as { name: string; version: string };
+
 async function main(): Promise<void> {
+  // --version (直接输出后退出,此时不进入 MCP 协议,可安全用 stdout)
+  if (process.argv.includes("--version") || process.argv.includes("-v")) {
+    process.stdout.write(`${pkg.version}\n`);
+    return;
+  }
+
   // --help / --version
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    process.stderr.write(`browser-ref-mcp — 给 agent 用的可靠浏览器控制 MCP server
+    process.stderr.write(`browser-ref-mcp ${pkg.version} — 给 agent 用的可靠浏览器控制 MCP server
 
-用法: node dist/index.js [选项]
+用法: npx browser-ref-mcp [选项]
   --cdp-url <url>     connect 模式:连接已开调试端口的浏览器(如 http://127.0.0.1:9222)
   --headless          无头模式(默认有头)
   --profile <dir>     指定 profile 用户数据目录(默认 ~/.browser-mcp/profile)
@@ -36,7 +49,7 @@ async function main(): Promise<void> {
   const registry = new RefRegistry();
 
   const server = new Server(
-    { name: "browser-ref-mcp", version: "0.1.0" },
+    { name: "browser-ref-mcp", version: pkg.version },
     { capabilities: { tools: {} } },
   );
   registerTools(server, manager, registry);
