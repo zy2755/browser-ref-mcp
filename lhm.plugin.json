@@ -7,7 +7,7 @@
   "category": "developer",
   "description": "Reliable browser-control MCP server for AI agents: click by ref, self-healing sessions.",
   "homepage": "https://github.com/zy2755/browser-ref-mcp",
-  "icon": "https://raw.githubusercontent.com/zy2755/browser-ref-mcp/main/plugin/logo.png",
+  "icon": "https://gcore.jsdelivr.net/gh/zy2755/browser-ref-mcp@main/plugin/logo.png",
   "tags": [
     "browser-automation",
     "browser-control",
