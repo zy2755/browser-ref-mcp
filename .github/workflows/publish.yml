@@ -44,6 +44,12 @@ jobs:
             exit 1
           fi
 
+      # 版本号散在 6 处（package.json / server.json ×2 / 插件市场 ×2 / plugin.json）。
+      # CI 在这里只「校验」不「自动改」：发布产物必须与 tag 指向的那次提交完全一致，
+      # 如果在流水线里改文件再发布，仓库内容就和已发布的包对不上了。修复在本地做。
+      - name: Verify version consistency across manifests
+        run: npm run check-version
+
       - name: Publish
         # 走 OIDC，不需要 NODE_AUTH_TOKEN。provenance 由 npm 自动生成。
         run: npm publish

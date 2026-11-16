@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="browser-ref-mcp">
+  <!--
+    图标语义：一个浏览器窗口，其中一个元素被「锁定框选」，鼠标正点在它上面。
+    对应产品卖点 —— 不靠猜选择器，而是按 ref 精确命中目标元素。
+    设计约束：512×512；主体元素粗描边、无小字，保证缩到 128px 仍可辨认。
+  -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1D2A45"/>
+      <stop offset="1" stop-color="#0A0F1C"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5EEAD4"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- 浏览器窗口 -->
+  <rect x="72" y="96" width="368" height="316" rx="30" fill="#FFFFFF" fill-opacity="0.04"
+        stroke="#93A3B8" stroke-width="12" stroke-opacity="0.75"/>
+  <path d="M78 168 H434" stroke="#93A3B8" stroke-width="10" stroke-opacity="0.5"/>
+  <circle cx="114" cy="132" r="9" fill="#64748B"/>
+  <circle cx="146" cy="132" r="9" fill="#64748B"/>
+  <circle cx="178" cy="132" r="9" fill="#64748B"/>
+
+  <!-- 页面内容骨架 -->
+  <rect x="104" y="196" width="168" height="16" rx="8" fill="#64748B" fill-opacity="0.55"/>
+  <rect x="104" y="228" width="112" height="16" rx="8" fill="#64748B" fill-opacity="0.38"/>
+
+  <!-- 被命中的目标元素 -->
+  <rect x="190" y="292" width="138" height="56" rx="16" fill="url(#accent)" fill-opacity="0.26"/>
+
+  <!-- 锁定框的四角（比整圈更容易在缩小后辨认） -->
+  <g fill="none" stroke="url(#accent)" stroke-width="10" stroke-linecap="round">
+    <path d="M180 312 V282 H210"/>
+    <path d="M308 282 H338 V312"/>
+    <path d="M180 328 V358 H210"/>
+    <path d="M308 358 H338 V328"/>
+  </g>
+
+  <!-- 鼠标指针，指尖落在元素上 -->
+  <path d="M316 344 L316 386 L326 376.5 L333 394 L343 390 L335.5 373 L350 372 Z"
+        fill="#F8FAFC" stroke="#0A0F1C" stroke-width="6.5" stroke-linejoin="round"/>
+</svg>

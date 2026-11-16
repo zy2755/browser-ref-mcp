@@ -9,6 +9,7 @@
   "homepage": "https://github.com/zy2755/browser-ref-mcp",
   "repository": "https://github.com/zy2755/browser-ref-mcp",
   "license": "Apache-2.0",
+  "icon": "./logo.png",
   "keywords": [
     "browser",
     "browser-automation",
