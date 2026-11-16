@@ -1,0 +1,3 @@
+# GitHub Actions 的 run: 脚本在 Linux runner 上执行，
+# 若文件带 CRLF，会报 `$'\r': command not found`，这里强制用 LF。
+.github/workflows/* text eol=lf
