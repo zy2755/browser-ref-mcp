@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "browser-ref": {
+      "command": "npx",
+      "args": ["-y", "browser-ref-mcp"]
+    }
+  }
+}

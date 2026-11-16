@@ -1,0 +1,18 @@
+{
+  "name": "browser-ref-mcp",
+  "version": "0.1.1",
+  "description": "Reliable browser control for Claude: semantic snapshots with stable [eN] refs, click-by-ref with fallback resolution, self-healing reconnects. Drives your installed Chrome/Edge, no browser download.",
+  "author": {
+    "name": "zy2755",
+    "url": "https://github.com/zy2755"
+  },
+  "homepage": "https://github.com/zy2755/browser-ref-mcp",
+  "repository": "https://github.com/zy2755/browser-ref-mcp",
+  "license": "Apache-2.0",
+  "keywords": [
+    "browser",
+    "browser-automation",
+    "playwright",
+    "mcp"
+  ]
+}

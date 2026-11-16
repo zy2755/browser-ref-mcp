@@ -22,6 +22,16 @@ Works with Claude Code, Claude Desktop, Cursor, Cline, Codex CLI, Windsurf, Open
 
 ## Quick start
 
+### Claude Code
+
+```
+/plugin install browser-ref-mcp --marketplace zy2755/browser-ref-mcp
+```
+
+One line installs the server plus a short skill that tells Claude when to reach for the browser and what to do when a `ref` goes stale.
+
+### Any other client
+
 ```bash
 npx -y browser-ref-mcp
 ```
