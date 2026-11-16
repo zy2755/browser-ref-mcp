@@ -2,12 +2,13 @@
 /**
  * 版本号同步 —— 单一真源是 package.json 的 version。
  *
- * 为什么需要这个脚本：版本号散在 6 处，插件市场、官方 MCP Registry、
+ * 为什么需要这个脚本：版本号散在 5 个文件 7 处，插件市场、官方 MCP Registry、
  * 客户端看到的插件版本分别读不同的文件。漏改一处，用户装到的是"旧版本"，
  * 但 npm 上明明已经发了新的 —— 这种不一致极难排查。
  *
  *   .claude-plugin/marketplace.json   metadata.version + plugins[].version
  *   plugin/.claude-plugin/plugin.json version
+ *   plugin/.cursor-plugin/plugin.json version（cursor.directory / Cursor 插件清单）
  *   server.json                       version + packages[].version
  *   lhm.plugin.json                   version（LobeHub 市场清单）
  *
@@ -30,6 +31,7 @@ const checkOnly = process.argv.includes("--check");
 const TARGETS = [
   { file: ".claude-plugin/marketplace.json", min: 2 },
   { file: "plugin/.claude-plugin/plugin.json", min: 1 },
+  { file: "plugin/.cursor-plugin/plugin.json", min: 1 },
   { file: "server.json", min: 2 },
   { file: "lhm.plugin.json", min: 1 },
 ];
