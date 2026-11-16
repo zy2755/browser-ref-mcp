@@ -1,6 +1,6 @@
 {
   "name": "browser-ref-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Reliable browser-control MCP server for AI agents: click by ref, self-healing sessions.",
   "mcpName": "io.github.zy2755/browser-ref-mcp",
   "type": "module",

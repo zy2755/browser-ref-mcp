@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Claude Code plugins by zy2755.",
-    "version": "0.1.1"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "browser-ref-mcp",
       "source": "./plugin",
       "description": "Reliable browser control for Claude: semantic snapshots with stable [eN] refs, click-by-ref with fallback resolution, self-healing reconnects. Drives your installed Chrome/Edge, no browser download.",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "author": {
         "name": "zy2755",
         "url": "https://github.com/zy2755"

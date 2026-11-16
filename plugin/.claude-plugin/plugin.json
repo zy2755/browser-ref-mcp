@@ -1,6 +1,6 @@
 {
   "name": "browser-ref-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Reliable browser control for Claude: semantic snapshots with stable [eN] refs, click-by-ref with fallback resolution, self-healing reconnects. Drives your installed Chrome/Edge, no browser download.",
   "author": {
     "name": "zy2755",
