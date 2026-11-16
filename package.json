@@ -23,7 +23,7 @@
     "smoke": "node test/smoke.mjs",
     "sync-version": "node scripts/sync-version.mjs",
     "check-version": "node scripts/sync-version.mjs --check",
-    "version": "node scripts/sync-version.mjs && git add .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json server.json"
+    "version": "node scripts/sync-version.mjs && git add .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json server.json lhm.plugin.json"
   },
   "keywords": [
     "mcp",

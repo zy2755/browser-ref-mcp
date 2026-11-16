@@ -9,6 +9,7 @@
  *   .claude-plugin/marketplace.json   metadata.version + plugins[].version
  *   plugin/.claude-plugin/plugin.json version
  *   server.json                       version + packages[].version
+ *   lhm.plugin.json                   version（LobeHub 市场清单）
  *
  * 用法：
  *   node scripts/sync-version.mjs          写入（npm version 时会自动调用）
@@ -30,6 +31,7 @@ const TARGETS = [
   { file: ".claude-plugin/marketplace.json", min: 2 },
   { file: "plugin/.claude-plugin/plugin.json", min: 1 },
   { file: "server.json", min: 2 },
+  { file: "lhm.plugin.json", min: 1 },
 ];
 
 const VERSION_FIELD = /("version"\s*:\s*")([^"]*)(")/g;

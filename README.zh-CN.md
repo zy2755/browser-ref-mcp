@@ -1,5 +1,7 @@
 # browser-ref-mcp
 
+[![LobeHub MCP](https://lobehub.com/badge/mcp/zy2755-browser-ref-mcp)](https://lobehub.com/mcp/zy2755-browser-ref-mcp) [![npm](https://img.shields.io/npm/v/browser-ref-mcp)](https://www.npmjs.com/package/browser-ref-mcp)
+
 给 AI agent 用的可靠浏览器控制 MCP server。针对现有浏览器工具的两大痛点专门设计:
 
 - **点不了网页内容** → 语义快照 + ref 编号定位 + 多级兜底(见下文"点击是怎么解决的")
