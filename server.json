@@ -1,0 +1,47 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.zy2755/browser-ref-mcp",
+  "description": "Reliable browser-control MCP server for AI agents: click by ref, self-healing sessions.",
+  "repository": {
+    "url": "https://github.com/zy2755/browser-ref-mcp",
+    "source": "github",
+    "id": "1455974279"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "browser-ref-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BROWSER_MCP_CDP_URL",
+          "description": "Connect to a browser already running with a debug port, e.g. http://127.0.0.1:9222. Leave unset to launch your own Chrome/Edge.",
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "BROWSER_MCP_HEADLESS",
+          "description": "Run without a visible browser window (default: headed, so the user can watch and take over).",
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "BROWSER_MCP_PROFILE",
+          "description": "Browser profile directory, keeps logins across sessions (default: ~/.browser-mcp/profile).",
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "BROWSER_MCP_CHANNELS",
+          "description": "Comma-separated browser channel fallback chain (default: chrome,msedge).",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
