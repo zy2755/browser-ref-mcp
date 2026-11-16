@@ -1,11 +1,29 @@
 ---
 name: browser-control
 description: Drive a real Chrome or Edge browser through the browser-ref MCP server — navigate, read pages, click by ref, fill forms, take screenshots. Use whenever a task needs a live logged-in browser, JavaScript-rendered content, or multi-step interaction (login, checkout, dashboards) that plain HTTP fetching cannot handle.
+license: Apache-2.0
 ---
 
 # Browser control
 
 The `browser-ref` MCP server drives a real, persistent browser. Pages are read as **semantic snapshots**: interactive elements get stable `[eN]` ids, and you act by id instead of guessing CSS selectors.
+
+## Setup
+
+This skill needs the `browser-ref` MCP server. It runs over stdio and uses the Chrome or Edge already installed — no browser download, no API key.
+
+```json
+{
+  "mcpServers": {
+    "browser-ref": {
+      "command": "npx",
+      "args": ["-y", "browser-ref-mcp"]
+    }
+  }
+}
+```
+
+Verify with `npx -y browser-ref-mcp --version`, or call `browser_get_info` once the server is connected. Source: <https://github.com/zy2755/browser-ref-mcp> · npm: `browser-ref-mcp`.
 
 ## The core loop
 
