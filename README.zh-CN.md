@@ -9,6 +9,12 @@
 
 技术栈:Node + TypeScript + playwright-core(免下载浏览器,直接驱动系统已装的 Chrome/Edge)。
 
+已在 LobeHub 上架:技能条目 [browser-control](https://lobehub.com/skills/zy2755-browser-ref-mcp-browser-control) 可一条命令装进 Claude Code:
+
+```bash
+npx -y @lobehub/market-cli skills install zy2755-browser-ref-mcp-browser-control --agent claude-code
+```
+
 ## 接入 MCP 客户端
 
 server 走 stdio,任何支持 stdio MCP 的客户端都能接。先 `npm install && npm run build`,再把 `dist/index.js` 的**绝对路径**填进客户端配置(GUI 应用常不继承 shell 的工作目录,相对路径容易解析失败)。

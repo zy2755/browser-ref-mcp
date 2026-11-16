@@ -31,6 +31,14 @@ Works with Claude Code, Claude Desktop, Cursor, Cline, Codex CLI, Windsurf, Open
 
 One line installs the server plus a short skill that tells Claude when to reach for the browser and what to do when a `ref` goes stale.
 
+### LobeHub Skills marketplace
+
+```bash
+npx -y @lobehub/market-cli skills install zy2755-browser-ref-mcp-browser-control --agent claude-code
+```
+
+Also listed as an MCP server at [lobehub.com/mcp/zy2755-browser-ref-mcp](https://lobehub.com/mcp/zy2755-browser-ref-mcp).
+
 ### Any other client
 
 ```bash
