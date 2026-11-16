@@ -97,14 +97,14 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     {
       name: "browser_navigate",
       description:
-        "导航到 URL,返回后自动附带页面交互元素快照(带 [eN] ref 编号,可直接用于 click/type)。缺协议时自动补 https://。",
+        "Navigate to a URL. Returns a snapshot of interactive elements with [eN] refs that feed straight into click/type. Adds https:// when the protocol is missing.",
       inputSchema: {
         type: "object",
         properties: {
-          url: { ...STR, description: "目标 URL" },
-          newTab: { ...BOOL, description: "是否在新标签页打开(默认 false,当前页导航)" },
-          timeoutMs: { ...NUM, description: "导航超时毫秒数(默认 30000)" },
-          snapshot: { ...BOOL, description: "是否在结果中附快照(默认 true)" },
+          url: { ...STR, description: "Target URL" },
+          newTab: { ...BOOL, description: "Open in a new tab (default false: navigate the current tab)" },
+          timeoutMs: { ...NUM, description: "Navigation timeout in ms (default 30000)" },
+          snapshot: { ...BOOL, description: "Include a snapshot in the result (default true)" },
         },
         required: ["url"],
         additionalProperties: false,
@@ -152,14 +152,18 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     {
       name: "browser_snapshot",
       description:
-        '获取当前页面语义快照:交互元素带 [eN] ref 编号(iframe 内容已拍平)。支持 rootRef(只看某元素子树)、selector、filter:"interactive" 只看交互元素。',
+        "Semantic snapshot of the current page: interactive elements carry [eN] refs, and iframe content is flattened in. Narrow it with rootRef (the subtree of a single element), selector, or filter:interactive (interactive elements only).",
       inputSchema: {
         type: "object",
         properties: {
-          filter: strEnum(["balanced", "interactive", "text"]),
-          rootRef: { ...STR, description: "只快照该 ref 元素的子树" },
-          selector: { ...STR, description: "只快照匹配该 CSS 选择器的子树(主文档)" },
-          maxElements: { ...NUM, description: "最多输出行数(默认 400)" },
+          filter: {
+            ...strEnum(["balanced", "interactive", "text"]),
+            description:
+              "balanced (default) keeps structure and text, interactive keeps only interactive elements, text keeps only text",
+          },
+          rootRef: { ...STR, description: "Snapshot only this element's subtree" },
+          selector: { ...STR, description: "Snapshot only the subtree matching this CSS selector (main document)" },
+          maxElements: { ...NUM, description: "Maximum output rows (default 400)" },
         },
         additionalProperties: false,
       },
@@ -180,17 +184,17 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     {
       name: "browser_click",
       description:
-        "点击元素(优先用快照里的 ref)。自动等待可操作、自动重解析失效 ref、点击后自动附最新快照。特殊对话框会自动处理并上报。",
+        "Click an element (prefer the ref from a snapshot). Waits until it is actionable, re-resolves refs that went stale, and returns a fresh snapshot afterwards. Dialogs are handled and reported automatically.",
       inputSchema: {
         type: "object",
         properties: {
-          ref: { ...STR, description: "快照中的 [eN] 编号" },
-          selector: { ...STR, description: "CSS 选择器(ref 不可用时的兜底)" },
-          text: { ...STR, description: "按可见文本匹配" },
+          ref: { ...STR, description: "The [eN] id shown in a snapshot" },
+          selector: { ...STR, description: "CSS selector (fallback when no ref is available)" },
+          text: { ...STR, description: "Match by visible text" },
           button: strEnum(["left", "right", "middle"]),
           doubleClick: { ...BOOL },
           timeoutMs: { ...NUM },
-          snapshot: { ...BOOL, description: "点击后是否附快照(默认 true)" },
+          snapshot: { ...BOOL, description: "Include a snapshot after clicking (default true)" },
         },
         additionalProperties: false,
       },
@@ -208,15 +212,15 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_type",
-      description: "向输入框输入文本(先清空再输入)。submit:true 时回车提交。适用于 input/textarea/contenteditable。",
+      description: "Type text into a field (clears it first). submit:true presses Enter. Works with input/textarea/contenteditable.",
       inputSchema: {
         type: "object",
         properties: {
           ref: { ...STR },
           selector: { ...STR },
-          text: { ...STR, description: "要输入的文本" },
-          submit: { ...BOOL, description: "输入后按 Enter(默认 false)" },
-          clear: { ...BOOL, description: "是否先清空(默认 true;false 则追加)" },
+          text: { ...STR, description: "Text to type" },
+          submit: { ...BOOL, description: "Press Enter after typing (default false)" },
+          clear: { ...BOOL, description: "Clear the field first (default true; false appends)" },
           timeoutMs: { ...NUM },
         },
         required: ["text"],
@@ -236,12 +240,12 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_press_key",
-      description: '按下键盘按键,如 Enter / Tab / ArrowDown / "Control+a"。带 ref 时先聚焦该元素。',
+      description: 'Press a key, e.g. Enter / Tab / ArrowDown / Control+a. With a ref, focuses that element first.',
       inputSchema: {
         type: "object",
         properties: {
-          key: { ...STR, description: "键名,如 Enter、Escape、ArrowDown、Control+a" },
-          ref: { ...STR, description: "先聚焦此元素再按键" },
+          key: { ...STR, description: "Key name, e.g. Enter, Escape, ArrowDown, Control+a" },
+          ref: { ...STR, description: "Focus this element before pressing" },
         },
         required: ["key"],
         additionalProperties: false,
@@ -258,13 +262,13 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_select_option",
-      description: "在下拉框(select)中选中选项。values 可为 value 或可见 label,自动两轮匹配。",
+      description: "Select options in a dropdown. values may be option values or visible labels; both are tried.",
       inputSchema: {
         type: "object",
         properties: {
           ref: { ...STR },
           selector: { ...STR },
-          values: { type: "array", items: STR, description: "要选中的 value/label 列表" },
+          values: { type: "array", items: STR, description: "Option value(s) or visible label(s) to select" },
           timeoutMs: { ...NUM },
         },
         required: ["values"],
@@ -283,7 +287,7 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_hover",
-      description: "鼠标悬停到元素上(触发悬浮菜单/tooltip)。",
+      description: "Hover an element to reveal hover-only menus or tooltips.",
       inputSchema: {
         type: "object",
         properties: {
@@ -306,13 +310,13 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_scroll",
-      description: "滚动页面或指定滚动容器(带 ref 时滚动该容器)。方向 + 像素量。",
+      description: "Scroll the page, or one scroll container when a ref is given. Direction plus pixel amount.",
       inputSchema: {
         type: "object",
         properties: {
           direction: strEnum(["up", "down", "left", "right"]),
-          amount: { ...NUM, description: "滚动像素(默认 600)" },
-          ref: { ...STR, description: "滚动该容器(快照中带 [可滚动] 标记的元素)" },
+          amount: { ...NUM, description: "Pixels to scroll (default 600)" },
+          ref: { ...STR, description: "Scroll this container instead (the one marked scrollable in a snapshot)" },
         },
         required: ["direction"],
         additionalProperties: false,
@@ -329,13 +333,13 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_screenshot",
-      description: "截屏并保存到本地,返回图片(供多模态查看)。可整页、可视区或单元素(ref)。",
+      description: "Screenshot the viewport, the full page, or a single element (ref). Returns the image and writes it to disk.",
       inputSchema: {
         type: "object",
         properties: {
-          fullPage: { ...BOOL, description: "整页截图(默认只截可视区)" },
-          ref: { ...STR, description: "只截该元素" },
-          filename: { ...STR, description: "文件名(不含扩展名,默认时间戳)" },
+          fullPage: { ...BOOL, description: "Capture the full page instead of the viewport" },
+          ref: { ...STR, description: "Capture only this element" },
+          filename: { ...STR, description: "File name without extension (default: timestamp)" },
         },
         additionalProperties: false,
       },
@@ -354,12 +358,12 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     {
       name: "browser_evaluate",
       description:
-        "逃生舱:在页面里执行 JS 并返回 JSON 可序列化结果。传函数字符串如 `() => document.title` 或 `() => {...}`;带 ref 时在该元素上执行(`(el, ) => el.value`)。",
+        "Escape hatch: run JS in the page and return a JSON-serializable result. Pass a function string such as `() => document.title` or `() => {...}`; with a ref the function runs on that element as `(el) => el.value`.",
       inputSchema: {
         type: "object",
         properties: {
-          js: { ...STR, description: "函数字符串,如 `() => document.querySelector('#app')?.innerText.slice(0,2000)`" },
-          ref: { ...STR, description: "在该元素上执行,回调第一个参数是元素" },
+          js: { ...STR, description: "Function string, e.g. `() => document.querySelector('#app')?.innerText.slice(0,2000)`" },
+          ref: { ...STR, description: "Run on this element; it becomes the first callback argument" },
         },
         required: ["js"],
         additionalProperties: false,
@@ -374,16 +378,16 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_wait",
-      description: '等待条件成立:timeMs 固定时长 / text 文本出现 / selector 元素出现 / url 跳转 / idle 网络空闲。可组合。',
+      description: 'Wait for a condition: timeMs (fixed delay) / text (appears) / selector (appears) / url (changes) / idle (network quiet). Combine them freely.',
       inputSchema: {
         type: "object",
         properties: {
           timeMs: { ...NUM },
-          text: { ...STR, description: "等待该文本出现在页面上" },
+          text: { ...STR, description: "Wait until this text appears on the page" },
           selector: { ...STR },
-          url: { ...STR, description: "等待 URL 变为该模式" },
-          idle: { ...BOOL, description: "等待网络空闲(最长 15s)" },
-          timeoutMs: { ...NUM, description: "等待超时(默认 15000)" },
+          url: { ...STR, description: "Wait until the URL matches this pattern" },
+          idle: { ...BOOL, description: "Wait for network idle (max 15s)" },
+          timeoutMs: { ...NUM, description: "Wait timeout (default 15000)" },
         },
         additionalProperties: false,
       },
@@ -398,14 +402,14 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_tabs",
-      description: "多标签管理:list 列出 / new 新建 / select 切换(按 list 显示的 index 或 id)/ close 关闭。",
+      description: "Manage tabs: list / new / select (by the index or id that list shows) / close.",
       inputSchema: {
         type: "object",
         properties: {
           action: strEnum(["list", "new", "select", "close"]),
-          url: { ...STR, description: "new 时打开的 URL(可选)" },
-          index: { ...NUM, description: "select/close 的目标标签序号(见 list 输出,0 起)" },
-          id: { ...STR, description: "select/close 的目标标签 pageId" },
+          url: { ...STR, description: "URL to open with new (optional)" },
+          index: { ...NUM, description: "Target tab index for select/close (as shown by list, 0-based)" },
+          id: { ...STR, description: "Target tab pageId for select/close" },
         },
         required: ["action"],
         additionalProperties: false,
@@ -459,7 +463,7 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_get_info",
-      description: "查询浏览器健康状态:模式、标签列表、重启次数、最近错误/对话框/下载。不会启动浏览器。",
+      description: "Browser health: mode, tab list, restart count, recent errors / dialogs / downloads. Never launches the browser.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       needsBrowser: false,
       handler: async () => {
@@ -485,7 +489,7 @@ export function registerTools(server: Server, manager: BrowserManager, registry:
     },
     {
       name: "browser_close",
-      description: "关闭浏览器(launch 模式下整个浏览器退出,profile 登录态保留;connect 模式只断开连接)。下次工具调用会自动重启。",
+      description: "Close the browser (launch mode quits it but keeps profile logins; connect mode only disconnects). The next tool call restarts it automatically.",
       inputSchema: {
         type: "object",
         properties: {},
