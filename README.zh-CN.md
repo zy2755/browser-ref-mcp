@@ -1,6 +1,6 @@
 # browser-ref-mcp
 
-[![LobeHub MCP](https://lobehub.com/badge/mcp/zy2755-browser-ref-mcp)](https://lobehub.com/mcp/zy2755-browser-ref-mcp) [![npm](https://img.shields.io/npm/v/browser-ref-mcp)](https://www.npmjs.com/package/browser-ref-mcp)
+[![LobeHub MCP](https://lobehub.com/badge/mcp/zy2755-browser-ref-mcp)](https://lobehub.com/mcp/zy2755-browser-ref-mcp) [![npm](https://img.shields.io/npm/v/browser-ref-mcp)](https://www.npmjs.com/package/browser-ref-mcp) [![mcpservers.org](https://img.shields.io/badge/mcpservers.org-listed-blue)](https://mcpservers.org/servers/zy2755/browser-ref-mcp) [![Glama](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp/badges/score.svg)](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp)
 
 给 AI agent 用的可靠浏览器控制 MCP server。针对现有浏览器工具的两大痛点专门设计:
 
@@ -14,6 +14,12 @@
 ```bash
 npx -y @lobehub/market-cli skills install zy2755-browser-ref-mcp-browser-control --agent claude-code
 ```
+
+### 其他收录渠道
+
+- [mcpservers.org](https://mcpservers.org/servers/zy2755/browser-ref-mcp) —— 含安装与配置说明的目录页
+- [Glama](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp) —— 工具定义评级 **A**,14 个工具全部收录
+- [cursor.directory](https://cursor.directory/plugins/browser-ref-mcp) —— Cursor 插件目录
 
 ## 接入 MCP 客户端
 

@@ -2,6 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/browser-ref-mcp)](https://www.npmjs.com/package/browser-ref-mcp)
 [![LobeHub MCP](https://lobehub.com/badge/mcp/zy2755-browser-ref-mcp)](https://lobehub.com/mcp/zy2755-browser-ref-mcp)
+[![mcpservers.org](https://img.shields.io/badge/mcpservers.org-listed-blue)](https://mcpservers.org/servers/zy2755/browser-ref-mcp)
+[![Glama](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp/badges/score.svg)](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp)
 [![Publish to npm](https://github.com/zy2755/browser-ref-mcp/actions/workflows/publish.yml/badge.svg)](https://github.com/zy2755/browser-ref-mcp/actions/workflows/publish.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
@@ -38,6 +40,12 @@ npx -y @lobehub/market-cli skills install zy2755-browser-ref-mcp-browser-control
 ```
 
 Also listed as an MCP server at [lobehub.com/mcp/zy2755-browser-ref-mcp](https://lobehub.com/mcp/zy2755-browser-ref-mcp).
+
+### Where else it's listed
+
+- [mcpservers.org](https://mcpservers.org/servers/zy2755/browser-ref-mcp) — directory listing with install and config walkthroughs
+- [Glama](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp) — rated **A** for tool definitions, all 14 tools indexed
+- [cursor.directory](https://cursor.directory/plugins/browser-ref-mcp) — Cursor plugin directory
 
 ### Any other client
 
