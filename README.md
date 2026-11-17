@@ -43,6 +43,7 @@ Also listed as an MCP server at [lobehub.com/mcp/zy2755-browser-ref-mcp](https:/
 
 ### Where else it's listed
 
+- [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) — listed under "Web content access and automation"
 - [mcpservers.org](https://mcpservers.org/servers/zy2755/browser-ref-mcp) — directory listing with install and config walkthroughs
 - [Glama](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp) — rated **A** for tool definitions, all 14 tools indexed
 - [cursor.directory](https://cursor.directory/plugins/browser-ref-mcp) — Cursor plugin directory

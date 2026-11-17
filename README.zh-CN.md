@@ -17,6 +17,7 @@ npx -y @lobehub/market-cli skills install zy2755-browser-ref-mcp-browser-control
 
 ### 其他收录渠道
 
+- [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) —— 收录于「Web content access and automation」分类
 - [mcpservers.org](https://mcpservers.org/servers/zy2755/browser-ref-mcp) —— 含安装与配置说明的目录页
 - [Glama](https://glama.ai/mcp/servers/zy2755/browser-ref-mcp) —— 工具定义评级 **A**,14 个工具全部收录
 - [cursor.directory](https://cursor.directory/plugins/browser-ref-mcp) —— Cursor 插件目录
